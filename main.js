@@ -38,7 +38,8 @@ define(function (require, exports, module) {
         DefaultDialogs              = brackets.getModule("widgets/DefaultDialogs"),
         Dialogs                     = brackets.getModule("widgets/Dialogs"),
         jiraStrings                 = require("strings"),
-        ExtensionDialogTemplate     = require("text!htmlContent/MyExtensionDialog.html");
+        ExtensionDialogTemplate     = require("text!htmlContent/MyExtensionDialog.html"),
+        jira                        = require("app/jira");
 
 
     /** @const {string} Extension Command ID */
@@ -48,7 +49,7 @@ define(function (require, exports, module) {
     var JIRA_MODULENAME               = "jira-module";
 
     /* Our extension's preferences */
-    var prefs = PreferencesManager.getExtensionPrefs(MY_MODULENAME);
+    var prefs = PreferencesManager.getExtensionPrefs(JIRA_MODULENAME);
 
     // Define a preference to keep track of how many times our extension has been ivoked
     prefs.definePreference("runCount", "number", 0);
@@ -58,7 +59,7 @@ define(function (require, exports, module) {
 
     function showMyDialog() {
         // Increment our run count
-        var runCount = prefs.get("runCount") || 0;
+        /*var runCount = prefs.get("runCount") || 0;
         prefs.set("runCount", ++runCount);
 
         // This is input data into the template
@@ -76,17 +77,18 @@ define(function (require, exports, module) {
             if (buttonId === "close") {
                 alert("Hello World");
             }
-        });
+        });*/
+        jira.init();
     }
 
 
     // Extension init code goes at the bottom
     ExtensionUtils.loadStyleSheet(module, "styles/styles.css");
     // Register the command -- The command and the command title are kept together
-    CommandManager.register(jiraStrings.MENU_ITEM_LABEL, MY_COMMANDID, showMyDialog);
+    CommandManager.register(jiraStrings.MENU_ITEM_LABEL, JIRA_COMMANDID, showMyDialog);
     // Add a new menu before the help menu.
     //  if you want to modify an existing menu you would use Menus.getMenu -- e.g. Menus.getMenu(Menus.AppMenuBar.FILE_MENU);
-    var menu = Menus.addMenu(jiraStrings.MENU_LABEL, MY_MENUID, Menus.BEFORE, Menus.AppMenuBar.HELP_MENU);
+    var menu = Menus.addMenu(jiraStrings.MENU_LABEL, JIRA_MENUID, Menus.BEFORE, Menus.AppMenuBar.HELP_MENU);
     // Now add the menu item to invoke it.  Add a keyboard shortcut as well.
-    menu.addMenuItem(MY_COMMANDID, "Ctrl-Alt-X");
+    menu.addMenuItem(JIRA_COMMANDID, "Ctrl-Alt-X");
 });

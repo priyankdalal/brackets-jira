@@ -1,3 +1,15 @@
 /*
  * Place CSS here
  */
+#jira-panel label{display: inline-block;line-height: 1.6;vertical-align: middle;}
+#jira-panel input,
+#jira-panel select{
+    width:150px;
+    margin:0 5px;
+}
+#jira-panel .bug{
+    background-color:#f1acac !important;
+}
+#jira-panel .task{
+    background-color:#a6f2a6 !important;
+}

@@ -27,8 +27,8 @@
 /*global define */
 
 define({
-    "MENU_LABEL"                        : "Extension",
-    "MENU_ITEM_LABEL"                   : "My Extension…",
-    "DIALOG_TITLE"                      : "Hello World",
-    "DIALOG_TEXT"                       : "Hello from my extension!"
+    "MENU_LABEL"                        : "Jira",
+    "MENU_ITEM_LABEL"                   : "Jira",
+    "DIALOG_TITLE"                      : "Jira",
+    "DIALOG_TEXT"                       : "still in development"
 });
