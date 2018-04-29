@@ -1,0 +1,12 @@
+{
+    "name": "priyank.jira",
+    "title": "Jira",
+    "description": "jira support in brackets",
+    "homepage": "https://github.com/<repo>",
+    "version": "0.0.1",
+    "author": "priyank",
+    "license": "MIT",
+    "engines": {
+        "brackets": ">=0.24.0"
+    }
+}
