@@ -91,9 +91,10 @@ define(function (require, exports, module) {
     }
     Jira.showTickets=function(data){
         var t=data.issues;
+
         var h="<tr><th>Key</th><th>Summary</th><th>Assignee</th><th>Created By</th><th>Date</th><th>Type</th><th>Priority</th><th>Reporter</th><th>Status</th></tr>";
         for(var i=0;i<t.length;i++){
-            h+="<tr>";
+            h+="<tr class='ticket' data-id='"+ t[i].id +"'>";
             h+="<td>"+ t[i].key+ "</td>"
                 +"<td>"+ t[i].fields.summary+ "</td>"
                 +"<td>"+ t[i].fields.assignee.name+ "</td>"
@@ -104,6 +105,9 @@ define(function (require, exports, module) {
                 +"<td>"+ t[i].fields.reporter.name+ "</td>"
                 +"<td>"+ t[i].fields.status.name+ "</td>";
             h+="</tr>";
+        }
+        if(t.length<1){
+            h="No data to show.";
         }
         var jiraTable=Jira.$panel.find("#jira_table");
         jiraTable.empty().append(h);
@@ -123,11 +127,19 @@ define(function (require, exports, module) {
             Jira.$panel.hide();
         });
         $("#jira_get_list").click(function(){
+            Jira.$panel.find("#jira_table").empty().append("<tr><th>fetching data<span class='jira-loading'>.</span><span class='jira-loading'>.</span><span class='jira-loading'>.</span></th></tr>");
             Jira.project=$("#jira_project").val();
             Jira.assignee=$("#jira_assignee").val();
             Jira.getTickets(Jira.showTickets);
         });
         Jira.$panel.show();
+    }
+    Jira.hidePanel=function(){
+        if (Jira.panel && Jira.panel.isVisible()) {
+            this._$table.empty();
+            Jira.panel.hide();
+            // Jira.panel.$panel.off(".bookmarks");
+        }
     }
     var jira=new Jira();
     module.exports = jira;
