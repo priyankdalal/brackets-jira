@@ -1,0 +1,18 @@
+<div class="jira-comment-dialog modal">
+    <div class="modal-header">
+        <h1 class="dialog-title">{{comment.DIALOG_TITLE}}</h1>
+    </div>
+    <div class="modal-body">
+        {{{comment.COMMENT_HTML}}}
+    </div>
+    <div class="modal-footer">
+      <div class="jira-panel panel">
+           <div class="panel-heading">Add Comment</div>
+            <div class="panel-body">
+                <textarea class="jira-comment-input form-control" placeholder="add comment"></textarea>
+            </div>
+        </div>
+       <button class="dialog-button btn basic" data-button-id="close">Comment</button>
+        <button class="dialog-button btn primary" data-button-id="close">{{comment.CLOSE}}</button>
+    </div>
+</div>

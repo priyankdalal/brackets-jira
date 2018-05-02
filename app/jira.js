@@ -27,8 +27,12 @@
 define(function (require, exports, module) {
 
     'use strict';
+    var Dialogs= brackets.getModule("widgets/Dialogs");
+
     var workspaceManager=brackets.getModule("view/WorkspaceManager");
     var jiraPanelTemplate=require("text!htmlContent/jiraPanelTemplate.html");
+    var CommentDialogTemplate=require("text!htmlContent/commentDialog.html");
+    var CommentDialogMediaTemplate=require("text!htmlContent/commentDialogMediaTemplate.html");
     var configData=require("text!config/config.json");
     var config=JSON.parse(configData);
 
@@ -47,6 +51,7 @@ define(function (require, exports, module) {
     Jira.getProjects=function(callback){
         $.ajax({
             url:config.url+ config.api.all_projects,
+            timeout:5000,
             headers:{
                 "Authorization":"Basic "+btoa(config.username+ ":"+ config.token),
                 "Accept":"application/json"
@@ -88,6 +93,7 @@ define(function (require, exports, module) {
         if(!!Jira.assignee) jql+=" and assignee = "+ Jira.assignee;
         $.ajax({
             url:config.url+ config.api.tickets,
+            timeout:5000,
             headers:{
                 "Authorization":"Basic "+btoa(config.username+ ":"+ config.token),
                 "Accept":"application/json",
@@ -119,7 +125,7 @@ define(function (require, exports, module) {
         var h="<tr><th>Tick</th><th>Key</th><th>Summary</th><th>Assignee</th><th>Created By</th><th>Date</th><th>Type</th><th>Priority</th><th>Reporter</th><th>Status</th></tr>";
         for(var i=0;i<t.length;i++){
             h+="<tr class='ticket' data-id='"+ t[i].id +"'>";
-            h+="<td><input type='checkbox' class='sprint-check' value='"+ t[i].id+ "' /></td>"
+            h+="<td><input type='checkbox' class='sprint-check' data-key='"+ t[i].key+ "' value='"+ t[i].id+ "' /></td>"
                 +"<td>"+ t[i].key+ "</td>"
                 +"<td>"+ t[i].fields.summary+ "</td>"
                 +"<td>"+ t[i].fields.assignee.name+ "</td>"
@@ -143,28 +149,92 @@ define(function (require, exports, module) {
         jiraTable.find(".sprint-check").on("click",function(){
             $(".sprint-check").prop("checked",false);
             $(this).prop("checked",(!$(this).is(":checked")));
-            Jira.sprint=$(this).val();
+            Jira.sprint={id:$(this).val(),key:$(this).attr("data-key")};
             $(".jira-option").prop("disabled",false);
         });
         Jira.$panel.find(".jira-get-comment").on("click",function(){
-            Jira.getComments(Jira.sprint);
+            Jira.getComments(Jira.sprint,Jira.showCommentsDialog);
+        });
+        Jira.$panel.find(".jira-get-worklog").on("click",function(){
+            Jira.getWorklog(Jira.sprint,Jira.showWorklog);
         });
     };
-    Jira.getComments=function(id){
-        var url=config.url+ config.api.comments.replace("key",id);
+    Jira.getComments=function(sprint,callback){
+        var url=config.url+ config.api.comments.replace("key",sprint.id);
         $.ajax({
             url:url,
+            timeout:5000,
             headers:{
                 "Authorization":"Basic "+btoa(config.username+ ":"+ config.token),
                 "Accept":"application/json"
             },
+            timeout:5000,
             success:function(res){
                 console.log(res);
+                callback(sprint,res);
             },
             error:function(res){
                 console.log(res);
             }
         });
+    };
+    Jira.showCommentsDialog=function(sprint,data){
+        var cmntsHtml="";
+        var cmnts=data.comments;
+        if(cmnts.length>1){
+            for(var i=0;i<cmnts.length;i++){
+                cmntsHtml+=Mustache.render(CommentDialogMediaTemplate,cmnts[i]);
+            }
+        }else cmntsHtml="<div class='well'>No comments till yet.</div>"
+        console.log(cmntsHtml);
+        var m_opt={
+            comment:{
+                DIALOG_TITLE:"Comments for "+sprint.key,
+                COMMENT_HTML:cmntsHtml,
+                CLOSE:"Close"
+            }
+        };
+        var dialog = Dialogs.showModalDialogUsingTemplate(Mustache.render(CommentDialogTemplate, m_opt));
+
+    };
+    Jira.getWorklog=function(sprint,callback){
+        var url=config.url+ config.api.getWorklog.replace("key",sprint.id);
+        console.log(url);
+        $.ajax({
+            url:url,
+            timeout:5000,
+            headers:{
+                "Authorization":"Basic "+btoa(config.username+ ":"+ config.token),
+                "Accept":"application/json"
+            },
+            timeout:5000,
+            success:function(res){
+                console.log(res);
+                //callback(sprint,res);
+            },
+            error:function(res){
+                console.log(res);
+            }
+        });
+    };
+    Jira.showWorklog=function(sprint,data){
+        var cmntsHtml="";
+        var cmnts=data.comments;
+        if(cmnts.length>1){
+            for(var i=0;i<cmnts.length;i++){
+                cmntsHtml+=Mustache.render(CommentDialogMediaTemplate,cmnts[i]);
+            }
+        }else cmntsHtml="<div class='well'>No comments till yet.</div>"
+        console.log(cmntsHtml);
+        var m_opt={
+            comment:{
+                DIALOG_TITLE:"Comments for "+sprint.key,
+                COMMENT_HTML:cmntsHtml,
+                CLOSE:"Close"
+            }
+        };
+        var dialog = Dialogs.showModalDialogUsingTemplate(Mustache.render(CommentDialogTemplate, m_opt));
+
     };
     Jira.hidePanel=function(){
         if (Jira.panel && Jira.panel.isVisible()) {
