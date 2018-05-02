@@ -1,15 +1,42 @@
 /*
  * Place CSS here
  */
+#jira-panel{font-size: 9px;}
+#jira-panel .toolbar{overflow: visible;}
 #jira-panel label{display: inline-block;line-height: 1.6;vertical-align: middle;}
 #jira-panel input,
 #jira-panel select{
     width:150px;
     margin:0 5px;
 }
+
+#jira-panel .btn.btn-small{
+    width:75px;
+}
+#jira-panel .dropdown-menu{
+    width:80px;
+}
+#jira-panel .btn-small .caret{
+    margin-top: 4px !important;
+    margin-left:4px !important;
+}
+
+#jira-panel #jira_table td{
+    padding-left:0px !important;
+    text-align: center;
+}
+#jira-panel #jira_table input[type=checkbox]{
+    width:13px;
+}
+
 #jira-panel .bug{
     background-color:#f1acac !important;
 }
 #jira-panel .task{
     background-color:#a6f2a6 !important;
+}
+#jira-panel .jira-right-icons{
+    position: absolute;
+    right:36px;
+    top:6px;
 }

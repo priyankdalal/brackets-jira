@@ -40,9 +40,10 @@ define(function (require, exports, module) {
     Jira.panel=null;
     Jira.$panel=null;
     Jira.panelElement=null;
+    Jira.sprint=null;
     Jira.prototype.init=function(){
         Jira.getProjects(Jira.showPanel);
-    }
+    };
     Jira.getProjects=function(callback){
         $.ajax({
             url:config.url+ config.api.all_projects,
@@ -58,59 +59,6 @@ define(function (require, exports, module) {
                 alert("error");
             }
         });
-    }
-    Jira.getTickets=function(callback){
-        var jql="project = "+Jira.project;
-        if(!!Jira.assignee) jql+=" and assignee = "+ Jira.assignee;
-        $.ajax({
-            url:config.url+ config.api.tickets,
-            headers:{
-                "Authorization":"Basic "+btoa(config.username+ ":"+ config.token),
-                "Accept":"application/json",
-                "Content-type":"application/json"
-            },
-            data:{
-                "jql": jql,
-                "startAt": 0,
-                "maxResults": 15,
-                "fields": [
-                    "summary",
-                    "status",
-                    "assignee"
-                ],
-                "fieldsByKeys": false
-            },
-            success:function(r){
-                console.log(r);
-                callback(r);
-            },
-            error:function(r){
-                alert("error");
-            }
-        });
-    }
-    Jira.showTickets=function(data){
-        var t=data.issues;
-
-        var h="<tr><th>Key</th><th>Summary</th><th>Assignee</th><th>Created By</th><th>Date</th><th>Type</th><th>Priority</th><th>Reporter</th><th>Status</th></tr>";
-        for(var i=0;i<t.length;i++){
-            h+="<tr class='ticket' data-id='"+ t[i].id +"'>";
-            h+="<td>"+ t[i].key+ "</td>"
-                +"<td>"+ t[i].fields.summary+ "</td>"
-                +"<td>"+ t[i].fields.assignee.name+ "</td>"
-                +"<td>"+ t[i].fields.creator.name+ "</td>"
-                +"<td>"+ t[i].fields.created+ "</td>"
-                +"<td class='"+ t[i].fields.issuetype.name.toLowerCase() +"'>"+ t[i].fields.issuetype.name+ "</td>"
-                +"<td>"+ t[i].fields.priority.name+ "</td>"
-                +"<td>"+ t[i].fields.reporter.name+ "</td>"
-                +"<td>"+ t[i].fields.status.name+ "</td>";
-            h+="</tr>";
-        }
-        if(t.length<1){
-            h="No data to show.";
-        }
-        var jiraTable=Jira.$panel.find("#jira_table");
-        jiraTable.empty().append(h);
     };
     Jira.showPanel=function(projects){
         var m_opt={
@@ -133,10 +81,93 @@ define(function (require, exports, module) {
             Jira.getTickets(Jira.showTickets);
         });
         Jira.$panel.show();
-    }
+    };
+    Jira.getTickets=function(callback){
+        $(".jira-option").prop("disabled",true);
+        var jql="project = "+Jira.project;
+        if(!!Jira.assignee) jql+=" and assignee = "+ Jira.assignee;
+        $.ajax({
+            url:config.url+ config.api.tickets,
+            headers:{
+                "Authorization":"Basic "+btoa(config.username+ ":"+ config.token),
+                "Accept":"application/json",
+                "Content-type":"application/json"
+            },
+            data:{
+                "jql": jql,
+                "startAt": 0,
+                "maxResults": 20,
+                "fields": [
+                    "summary",
+                    "status",
+                    "assignee"
+                ],
+                "fieldsByKeys": false
+            },
+            success:function(r){
+                console.log(r);
+                callback(r);
+            },
+            error:function(r){
+                alert("error");
+            }
+        });
+    };
+    Jira.showTickets=function(data){
+        var t=data.issues;
+
+        var h="<tr><th>Tick</th><th>Key</th><th>Summary</th><th>Assignee</th><th>Created By</th><th>Date</th><th>Type</th><th>Priority</th><th>Reporter</th><th>Status</th></tr>";
+        for(var i=0;i<t.length;i++){
+            h+="<tr class='ticket' data-id='"+ t[i].id +"'>";
+            h+="<td><input type='checkbox' class='sprint-check' value='"+ t[i].id+ "' /></td>"
+                +"<td>"+ t[i].key+ "</td>"
+                +"<td>"+ t[i].fields.summary+ "</td>"
+                +"<td>"+ t[i].fields.assignee.name+ "</td>"
+                +"<td>"+ t[i].fields.creator.name+ "</td>"
+                +"<td>"+ t[i].fields.created+ "</td>"
+                +"<td class='"+ t[i].fields.issuetype.name.toLowerCase() +"'>"+ t[i].fields.issuetype.name+ "</td>"
+                +"<td>"+ t[i].fields.priority.name+ "</td>"
+                +"<td>"+ t[i].fields.reporter.name+ "</td>"
+                +"<td>"+ t[i].fields.status.name+ "</td>";
+            h+="</tr>";
+        }
+        if(t.length<1){
+            h="No data to show.";
+        }
+        var jiraTable=Jira.$panel.find("#jira_table");
+        jiraTable.empty().append(h);
+        Jira.bindTableUI();
+    };
+    Jira.bindTableUI=function(){
+        var jiraTable=Jira.$panel.find("#jira_table");
+        jiraTable.find(".sprint-check").on("click",function(){
+            $(".sprint-check").prop("checked",false);
+            $(this).prop("checked",(!$(this).is(":checked")));
+            Jira.sprint=$(this).val();
+            $(".jira-option").prop("disabled",false);
+        });
+        Jira.$panel.find(".jira-get-comment").on("click",function(){
+            Jira.getComments(Jira.sprint);
+        });
+    };
+    Jira.getComments=function(id){
+        var url=config.url+ config.api.comments.replace("key",id);
+        $.ajax({
+            url:url,
+            headers:{
+                "Authorization":"Basic "+btoa(config.username+ ":"+ config.token),
+                "Accept":"application/json"
+            },
+            success:function(res){
+                console.log(res);
+            },
+            error:function(res){
+                console.log(res);
+            }
+        });
+    };
     Jira.hidePanel=function(){
         if (Jira.panel && Jira.panel.isVisible()) {
-            this._$table.empty();
             Jira.panel.hide();
             // Jira.panel.$panel.off(".bookmarks");
         }
