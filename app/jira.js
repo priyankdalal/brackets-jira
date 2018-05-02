@@ -195,6 +195,13 @@ define(function (require, exports, module) {
             }
         };
         var dialog = Dialogs.showModalDialogUsingTemplate(Mustache.render(CommentDialogTemplate, m_opt));
+        console.log(dialog._$dlg);
+        dialog._$dlg.find(".dialog-add-comment").on("click",function(){
+            var comment=dialog._$dlg.find(".jira-comment-input").val();
+            var data={"body":comment};
+            //data=JSON.stringify(data);
+            Jira.addComment(sprint,data);
+        });
 
     };
     Jira.getWorklog=function(sprint,callback){
@@ -242,6 +249,28 @@ define(function (require, exports, module) {
             // Jira.panel.$panel.off(".bookmarks");
         }
     }
+    Jira.addComment=function(sprint,data){
+        var url=config.url+ config.api.addComment.replace("key",sprint.id);
+        console.log(url);
+        $.ajax({
+            url:url,
+            timeout:5000,
+            headers:{
+                "Authorization":"Basic "+btoa(config.username+ ":"+ config.token),
+                "Accept":"application/json",
+                "Content-Type": "application/json"
+            },
+            data:data,
+            timeout:5000,
+            success:function(res){
+                console.log(res);
+                //callback(sprint,res);
+            },
+            error:function(res){
+                console.log(res);
+            }
+        });
+    };
     var jira=new Jira();
     module.exports = jira;
 });
