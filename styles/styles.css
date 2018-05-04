@@ -42,6 +42,8 @@
 }
 .jira-well.well{
     box-shadow: 0 1px 4px -1px black;
+    user-select: text !important;
+    -user-select: text !important;
 }
 .jira-well.well:nth-child(even){
     background-color: #bbd6ef;

@@ -28,11 +28,13 @@ define(function (require, exports, module) {
 
     'use strict';
     var Dialogs= brackets.getModule("widgets/Dialogs");
-
+    var NodeDomain = brackets.getModule("utils/NodeDomain");
     var workspaceManager=brackets.getModule("view/WorkspaceManager");
+    var ExtensionUtils = brackets.getModule("utils/ExtensionUtils");
     var jiraPanelTemplate=require("text!htmlContent/jiraPanelTemplate.html");
     var CommentDialogTemplate=require("text!htmlContent/commentDialog.html");
     var CommentDialogMediaTemplate=require("text!htmlContent/commentDialogMediaTemplate.html");
+    var httpsDomain=new NodeDomain("httpsDomain",ExtensionUtils.getModulePath(module, "../node/httpsDomain"));
     var configData=require("text!config/config.json");
     var config=JSON.parse(configData);
 
@@ -61,7 +63,8 @@ define(function (require, exports, module) {
                 callback(r);
             },
             error:function(r){
-                alert("error");
+                alert("error: "+ r.status+ ",\nreason: "+ r.statusText);
+                console.log(r);
             }
         });
     };
@@ -74,17 +77,19 @@ define(function (require, exports, module) {
             }
         };
         var panelHtml=Mustache.render(jiraPanelTemplate,m_opt);
-        Jira.panel=workspaceManager.createBottomPanel("jira",$(panelHtml),200);
-        Jira.$panel=Jira.panel.$panel;
-        $(".jira-close").click(function(){
-            Jira.$panel.hide();
-        });
-        $("#jira_get_list").click(function(){
-            Jira.$panel.find("#jira_table").empty().append("<tr><th>fetching data<span class='jira-loading'>.</span><span class='jira-loading'>.</span><span class='jira-loading'>.</span></th></tr>");
-            Jira.project=$("#jira_project").val();
-            Jira.assignee=$("#jira_assignee").val();
-            Jira.getTickets(Jira.showTickets);
-        });
+        if(!Jira.$panel){
+            Jira.panel=workspaceManager.createBottomPanel("jira",$(panelHtml),200);
+            Jira.$panel=Jira.panel.$panel;
+            $(".jira-close").click(function(){
+                Jira.$panel.hide();
+            });
+            $("#jira_get_list").click(function(){
+                Jira.$panel.find("#jira_table").empty().append("<tr><th>fetching data<span class='jira-loading'>.</span><span class='jira-loading'>.</span><span class='jira-loading'>.</span></th></tr>");
+                Jira.project=$("#jira_project").val();
+                Jira.assignee=$("#jira_assignee").val();
+                Jira.getTickets(Jira.showTickets);
+            });
+        }
         Jira.$panel.show();
     };
     Jira.getTickets=function(callback){
@@ -115,7 +120,8 @@ define(function (require, exports, module) {
                 callback(r);
             },
             error:function(r){
-                alert("error");
+                alert("error: "+ r.status+ ",\nreason: "+ r.statusText);
+                console.log(r);
             }
         });
     };
@@ -174,14 +180,15 @@ define(function (require, exports, module) {
                 callback(sprint,res);
             },
             error:function(res){
-                console.log(res);
+                alert("error: "+ r.status+ ",\nreason: "+ r.statusText);
+                console.log(r);
             }
         });
     };
     Jira.showCommentsDialog=function(sprint,data){
         var cmntsHtml="";
         var cmnts=data.comments;
-        if(cmnts.length>1){
+        if(cmnts.length>0){
             for(var i=0;i<cmnts.length;i++){
                 cmntsHtml+=Mustache.render(CommentDialogMediaTemplate,cmnts[i]);
             }
@@ -199,7 +206,6 @@ define(function (require, exports, module) {
         dialog._$dlg.find(".dialog-add-comment").on("click",function(){
             var comment=dialog._$dlg.find(".jira-comment-input").val();
             var data={"body":comment};
-            //data=JSON.stringify(data);
             Jira.addComment(sprint,data);
         });
 
@@ -250,16 +256,20 @@ define(function (require, exports, module) {
         }
     }
     Jira.addComment=function(sprint,data){
-        var url=config.url+ config.api.addComment.replace("key",sprint.id);
+        /*var url=config.url+ config.api.addComment.replace("key",sprint.id);
         console.log(url);
         $.ajax({
             url:url,
+            type:"POST",
             timeout:5000,
             headers:{
                 "Authorization":"Basic "+btoa(config.username+ ":"+ config.token),
                 "Accept":"application/json",
-                "Content-Type": "application/json"
+                "Content-Type": "application/json; charset=utf-8",
+                'Access-Control-Allow-Origin': '*,',
+                "user-agent":"Mozilla/5.0 (Windows NT 6.3; Win64; x64; AppleWebKit-537.36; Chrome-45.0.2454.85; Electron-0.34.2; Safari-537.36) like Gecko"
             },
+            dataType:"json",
             data:data,
             timeout:5000,
             success:function(res){
@@ -269,7 +279,33 @@ define(function (require, exports, module) {
             error:function(res){
                 console.log(res);
             }
+        });*/
+        var url="reqres.in/api/users";
+        var path=config.api.addComment.replace("key",sprint.id);
+        var options={
+            "body":data,
+            "host":config.host,
+            "path":path,
+            "headers": {
+                "Authorization":"Basic "+btoa(config.username+ ":"+ config.token),
+                "Accept":"application/json",
+                "Content-Type": "application/json; charset=utf-8",
+            },
+        };
+        httpsDomain.exec("getHttps",options);
+        httpsDomain.on("httpsresponse",function(ev,scope,message,data){
+            console.log(ev);
+            console.log(scope);
+            console.log(message);
+            console.log(data);
+            if(data.hasOwnProperty("id"))
+                alert("Comment submitted.");
+            else
+                alert("Failed to comment.");
         });
+    };
+    Jira.getHttpsResponse=function(data){
+        console.log(data);
     };
     var jira=new Jira();
     module.exports = jira;
