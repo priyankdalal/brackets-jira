@@ -9,6 +9,12 @@
     width:150px;
     margin:0 5px;
 }
+#jira-panel select{
+    height: 25px;
+}
+#jira-panel input[type=text]{
+    height: 16px;
+}
 
 #jira-panel .btn.btn-small{
     width:75px;

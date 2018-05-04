@@ -2,13 +2,14 @@
     <div class="toolbar simple-toolbar-layout mainToolbar">
        <div class="btn-group"><label for="" class="control-label"><strong>Jira</strong></label></div>
         <div class="btn-group">
-           <label for="" class="control-label">Filters:</label>
-            <select id="jira_project">{{{project_options}}}</select>
-            <input type="text" id="jira_assignee" class="form-control" placeholder="enter assignee">
-            <input type="button" id="jira_get_list" class="form-control" value="Get List">
+           <label for="" class="control-label lable-sm">Filters:</label>
+            <select id="jira_project" class="input-sm">{{{project_options}}}</select>
+            <input type="text" id="jira_assignee" class="form-control input-sm" placeholder="enter assignee">
+            <input type="button" id="jira_get_list" class="form-control btn btn-primary btn-small" value="Get List">
         </div>
         <div class="jira-right-icons">
             <div class="btn-group dropup">
+               <button class="jira-option btn btn-primary btn-small" type="button">Log Time</button>
                 <ul class="dropdown-menu">
                     <li><a href="#" class="jira-get-comment">Get Comments</a></li>
                     <li><a href="#" class="jira-get-worklog">Get worklog</a></li>

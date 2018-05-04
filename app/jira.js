@@ -158,10 +158,10 @@ define(function (require, exports, module) {
             Jira.sprint={id:$(this).val(),key:$(this).attr("data-key")};
             $(".jira-option").prop("disabled",false);
         });
-        Jira.$panel.find(".jira-get-comment").on("click",function(){
+        Jira.$panel.find(".jira-get-comment").off("click").on("click",function(){
             Jira.getComments(Jira.sprint,Jira.showCommentsDialog);
         });
-        Jira.$panel.find(".jira-get-worklog").on("click",function(){
+        Jira.$panel.find(".jira-get-worklog").off("click").on("click",function(){
             Jira.getWorklog(Jira.sprint,Jira.showWorklog);
         });
     };
@@ -190,6 +190,7 @@ define(function (require, exports, module) {
         var cmnts=data.comments;
         if(cmnts.length>0){
             for(var i=0;i<cmnts.length;i++){
+                cmnts[i].sprint_key=sprint.key;
                 cmntsHtml+=Mustache.render(CommentDialogMediaTemplate,cmnts[i]);
             }
         }else cmntsHtml="<div class='well'>No comments till yet.</div>"
