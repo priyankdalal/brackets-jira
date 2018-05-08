@@ -47,6 +47,7 @@ define(function (require, exports, module) {
     Jira.$panel=null;
     Jira.panelElement=null;
     Jira.sprint=null;
+    Jira.issues=null;
     Jira.prototype.init=function(){
         Jira.getProjects(Jira.showPanel);
     };
@@ -81,7 +82,7 @@ define(function (require, exports, module) {
             Jira.panel=workspaceManager.createBottomPanel("jira",$(panelHtml),200);
             Jira.$panel=Jira.panel.$panel;
             $(".jira-close").click(function(){
-                Jira.$panel.hide();
+                Jira.panel.hide();
             });
             $("#jira_get_list").click(function(){
                 Jira.$panel.find("#jira_table").empty().append("<tr><th>fetching data<span class='jira-loading'>.</span><span class='jira-loading'>.</span><span class='jira-loading'>.</span></th></tr>");
@@ -90,7 +91,7 @@ define(function (require, exports, module) {
                 Jira.getTickets(Jira.showTickets);
             });
         }
-        Jira.$panel.show();
+        Jira.panel.show();
     };
     Jira.getTickets=function(callback){
         $(".jira-option").prop("disabled",true);
@@ -107,7 +108,7 @@ define(function (require, exports, module) {
             data:{
                 "jql": jql,
                 "startAt": 0,
-                "maxResults": 20,
+                "maxResults": 10,
                 "fields": [
                     "summary",
                     "status",
@@ -127,13 +128,14 @@ define(function (require, exports, module) {
     };
     Jira.showTickets=function(data){
         var t=data.issues;
-
+        Jira.issues=t;
+        Jira.showTicketPagination(data.startAt,data.maxResults,data.total);
         var h="<tr><th>Tick</th><th>Key</th><th>Summary</th><th>Assignee</th><th>Created By</th><th>Date</th><th>Type</th><th>Priority</th><th>Reporter</th><th>Status</th></tr>";
         for(var i=0;i<t.length;i++){
-            h+="<tr class='ticket' data-id='"+ t[i].id +"'>";
+            h+="<tr class='ticket' data-id='"+ t[i].id +"' data-seq='"+ i+ "'>";
             h+="<td><input type='checkbox' class='sprint-check' data-key='"+ t[i].key+ "' value='"+ t[i].id+ "' /></td>"
                 +"<td>"+ t[i].key+ "</td>"
-                +"<td>"+ t[i].fields.summary+ "</td>"
+                +"<td class='ticket-summary'>"+ t[i].fields.summary+ "</td>"
                 +"<td>"+ t[i].fields.assignee.name+ "</td>"
                 +"<td>"+ t[i].fields.creator.name+ "</td>"
                 +"<td>"+ t[i].fields.created+ "</td>"
@@ -150,6 +152,9 @@ define(function (require, exports, module) {
         jiraTable.empty().append(h);
         Jira.bindTableUI();
     };
+    Jira.showTicketPagination=function(s,m,n){
+
+    };
     Jira.bindTableUI=function(){
         var jiraTable=Jira.$panel.find("#jira_table");
         jiraTable.find(".sprint-check").on("click",function(){
@@ -163,6 +168,11 @@ define(function (require, exports, module) {
         });
         Jira.$panel.find(".jira-get-worklog").off("click").on("click",function(){
             Jira.getWorklog(Jira.sprint,Jira.showWorklog);
+        });
+        Jira.$panel.find(".ticket-summary").off("click").on("click",function(){
+            var seq=$(this).parent().attr("data-seq");
+            var h="<pre>"+ Jira.issues[parseInt(seq)].fields.description+ "</pre>";
+            var dialog=Dialogs.showModalDialog("jira.description", "Description",h,[{ className: "btn btn-basic", id: "jira-des-ok", text: "Ok" }]);
         });
     };
     Jira.getComments=function(sprint,callback){

@@ -34,7 +34,9 @@
 #jira-panel #jira_table input[type=checkbox]{
     width:13px;
 }
-
+#jira-panel #jira_table .ticket-summary{
+    cursor: pointer;
+}
 #jira-panel .bug{
     background-color:#f1acac !important;
 }
@@ -79,4 +81,43 @@
     width: 97%;
     margin-bottom: 0;
     max-width: 97%;
+}
+/*************pagination style***********/
+#jira-panel .pagination-toolbar{
+    background-color: #d4d7d7;
+    width: 100%;
+    text-align: center;
+    border-top:thin solid #e5e5e5;
+    border-bottom:thin solid #888888;
+    padding: 4px 0 2px 0;
+}
+#jira-panel .pagination {
+    display: inline-block;
+    margin:1px 0;
+}
+
+#jira-panel .pagination a {
+    color: black;
+    float: left;
+    padding: 2px 16px;
+    text-decoration: none;
+    border: 1px solid #6394ad;
+}
+.pagination a.active {
+    background-color: #ebf2fa;
+    color: white;
+    border: 1px solid #4CAF50;
+}
+.pagination a:hover:not(.active) {background-color: #ddd;}
+#jira-panel .pagination a:first-child {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+#jira-panel .pagination a:last-child {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+#jira-panel .center {
+    text-align: center;
 }
