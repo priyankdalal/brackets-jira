@@ -84,6 +84,7 @@ define(function (require, exports, module) {
 
     // Extension init code goes at the bottom
     ExtensionUtils.loadStyleSheet(module, "styles/styles.css");
+    ExtensionUtils.loadStyleSheet(module, "styles/simplePagination.css");
     // Register the command -- The command and the command title are kept together
     CommandManager.register(jiraStrings.MENU_ITEM_LABEL, JIRA_COMMANDID, showMyDialog);
     // Add a new menu before the help menu.

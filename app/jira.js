@@ -28,6 +28,7 @@ define(function (require, exports, module) {
 
     'use strict';
     var Dialogs= brackets.getModule("widgets/Dialogs");
+    var jiraPagination= require("app/simplePagination");
     var NodeDomain = brackets.getModule("utils/NodeDomain");
     var workspaceManager=brackets.getModule("view/WorkspaceManager");
     var ExtensionUtils = brackets.getModule("utils/ExtensionUtils");
@@ -85,15 +86,15 @@ define(function (require, exports, module) {
                 Jira.panel.hide();
             });
             $("#jira_get_list").click(function(){
-                Jira.$panel.find("#jira_table").empty().append("<tr><th>fetching data<span class='jira-loading'>.</span><span class='jira-loading'>.</span><span class='jira-loading'>.</span></th></tr>");
                 Jira.project=$("#jira_project").val();
                 Jira.assignee=$("#jira_assignee").val();
-                Jira.getTickets(Jira.showTickets);
+                Jira.getTickets(0,Jira.showTickets);
             });
         }
         Jira.panel.show();
     };
-    Jira.getTickets=function(callback){
+    Jira.getTickets=function(startAt=0,callback){
+        Jira.$panel.find("#jira_table").empty().append("<tr><th>fetching data<span class='jira-loading'>.</span><span class='jira-loading'>.</span><span class='jira-loading'>.</span></th></tr>");
         $(".jira-option").prop("disabled",true);
         var jql="project = "+Jira.project;
         if(!!Jira.assignee) jql+=" and assignee = "+ Jira.assignee;
@@ -107,7 +108,7 @@ define(function (require, exports, module) {
             },
             data:{
                 "jql": jql,
-                "startAt": 0,
+                "startAt": startAt,
                 "maxResults": 10,
                 "fields": [
                     "summary",
@@ -153,7 +154,20 @@ define(function (require, exports, module) {
         Jira.bindTableUI();
     };
     Jira.showTicketPagination=function(s,m,n){
+        var currentPage=Math.ceil((parseInt(s)+1)/10);
+        console.log("currentPage: ",currentPage);
 
+        Jira.$panel.find("#pagination_container").pagination({
+            items: parseInt(n),
+            itemsOnPage: 10,
+            currentPage:currentPage,
+            cssStyle: 'compact-theme'
+        });
+        Jira.$panel.find("#pagination_container").find(".page-link").on("click",function(){
+            var seq=$(this).attr("href").split("-")[1];
+            seq=(parseInt(seq)-1)*10;
+            Jira.getTickets(seq,Jira.showTickets);
+        });
     };
     Jira.bindTableUI=function(){
         var jiraTable=Jira.$panel.find("#jira_table");
