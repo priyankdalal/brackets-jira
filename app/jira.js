@@ -29,6 +29,7 @@ define(function (require, exports, module) {
     'use strict';
     var Dialogs= brackets.getModule("widgets/Dialogs");
     var jiraPagination= require("app/simplePagination");
+    var jiraTimer= require("app/timer");
     var NodeDomain = brackets.getModule("utils/NodeDomain");
     var workspaceManager=brackets.getModule("view/WorkspaceManager");
     var ExtensionUtils = brackets.getModule("utils/ExtensionUtils");
@@ -49,6 +50,7 @@ define(function (require, exports, module) {
     Jira.panelElement=null;
     Jira.sprint=null;
     Jira.issues=null;
+    Jira.timer=null;
     Jira.prototype.init=function(){
         Jira.getProjects(Jira.showPanel);
     };
@@ -155,14 +157,13 @@ define(function (require, exports, module) {
     };
     Jira.showTicketPagination=function(s,m,n){
         var currentPage=Math.ceil((parseInt(s)+1)/10);
-        console.log("currentPage: ",currentPage);
 
         Jira.$panel.find("#pagination_container").pagination({
             items: parseInt(n),
             itemsOnPage: 10,
             currentPage:currentPage,
             cssStyle: 'compact-theme'
-        }).slideDown();;
+        }).slideDown();
         Jira.$panel.find("#pagination_container").find(".page-link").on("click",function(){
             Jira.$panel.find("#pagination_container").slideUp();
             var seq=$(this).attr("href").split("-")[1];
@@ -177,6 +178,33 @@ define(function (require, exports, module) {
             $(this).prop("checked",(!$(this).is(":checked")));
             Jira.sprint={id:$(this).val(),key:$(this).attr("data-key")};
             $(".jira-option").prop("disabled",false);
+            $(".jira-log-time").off("click").on("click",function(){
+                /* if data-timer is off
+                                    check if timer exist for spirnt
+                                    exist then start it otherwise create and start
+                                    if on then stop timer
+                */
+                if(!!Jira.timer){
+                    if($(this).attr("data-timer")=="off"){
+                        if(jiraTimer.hasTimer(Jira.sprint.key))
+                            jiraTimer.getTimer(Jira.sprint.key).start();
+                        else{
+                            jiraTimer.register({"issue":jira.sprint.key}).start();
+                        }
+                        $(this).attr("data-timer","on");
+                    }
+                }else{
+                    if($(this).attr("data-timer")=="off"){
+                        if(jiraTimer.hasTimer(Jira.sprint.key))
+                            jiraTimer.getTimer(Jira.sprint.key).start();
+                        else{
+                            jiraTimer.register({"issue":jira.sprint.key}).start();
+                        }
+                        $(this).attr("data-timer","on");
+                    }
+                }
+
+            });
         });
         Jira.$panel.find(".jira-get-comment").off("click").on("click",function(){
             Jira.getComments(Jira.sprint,Jira.showCommentsDialog);
@@ -184,6 +212,9 @@ define(function (require, exports, module) {
         Jira.$panel.find(".jira-get-worklog").off("click").on("click",function(){
             Jira.getWorklog(Jira.sprint,Jira.showWorklog);
         });
+        /*Jira.$panel.find(".jira-update-time").off("click").on("click",function(){
+
+        });*/
         Jira.$panel.find(".ticket-summary").off("click").on("click",function(){
             var seq=$(this).parent().attr("data-seq");
             var h="<pre>"+ Jira.issues[parseInt(seq)].fields.description+ "</pre>";
