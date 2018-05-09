@@ -162,8 +162,9 @@ define(function (require, exports, module) {
             itemsOnPage: 10,
             currentPage:currentPage,
             cssStyle: 'compact-theme'
-        });
+        }).slideDown();;
         Jira.$panel.find("#pagination_container").find(".page-link").on("click",function(){
+            Jira.$panel.find("#pagination_container").slideUp();
             var seq=$(this).attr("href").split("-")[1];
             seq=(parseInt(seq)-1)*10;
             Jira.getTickets(seq,Jira.showTickets);
