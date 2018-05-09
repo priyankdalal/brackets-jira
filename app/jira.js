@@ -178,30 +178,29 @@ define(function (require, exports, module) {
             $(this).prop("checked",(!$(this).is(":checked")));
             Jira.sprint={id:$(this).val(),key:$(this).attr("data-key")};
             $(".jira-option").prop("disabled",false);
+            if(!!Jira.timer && Jira.timer.id!=jiraTimer.getTimer(Jira.sprint.key)){
+                $(".jira-log-time").prop("disabled",true);
+                console.log("here");
+            }
             $(".jira-log-time").off("click").on("click",function(){
-                /* if data-timer is off
-                                    check if timer exist for spirnt
-                                    exist then start it otherwise create and start
-                                    if on then stop timer
-                */
                 if(!!Jira.timer){
                     if($(this).attr("data-timer")=="off"){
-                        if(jiraTimer.hasTimer(Jira.sprint.key))
-                            jiraTimer.getTimer(Jira.sprint.key).start();
-                        else{
-                            jiraTimer.register({"issue":jira.sprint.key}).start();
-                        }
+                        Jira.timer.start();
                         $(this).attr("data-timer","on");
+                        $(this).text("Stop Timer.");
+                    }else{
+                        Jira.timer.stop();
+                        $(this).attr("data-timer","off");
+                        $(this).text("Log Time.");
                     }
                 }else{
-                    if($(this).attr("data-timer")=="off"){
-                        if(jiraTimer.hasTimer(Jira.sprint.key))
-                            jiraTimer.getTimer(Jira.sprint.key).start();
-                        else{
-                            jiraTimer.register({"issue":jira.sprint.key}).start();
-                        }
-                        $(this).attr("data-timer","on");
-                    }
+                    if(jiraTimer.hasTimer(Jira.sprint.key))
+                        Jira.timer=jiraTimer.getTimer(Jira.sprint.key);
+                    else
+                        Jira.timer=jiraTimer.register(Jira.sprint.key);
+                    Jira.timer.start();
+                    $(this).attr("data-timer","on");
+                    $(this).text("Stop Timer.");
                 }
 
             });

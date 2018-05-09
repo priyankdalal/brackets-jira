@@ -1,6 +1,6 @@
 define(function (require, exports, module) {
     function t(options){
-        this.project=options.issue;
+        this.id=options.issue;
         var timer=null;
         this.timer=timer;
         var time=0;
