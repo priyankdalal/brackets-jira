@@ -1,6 +1,6 @@
 define(function (require, exports, module) {
-    function t(options){
-        this.id=options.issue;
+    function t(id){
+        this.id=id;
         var timer=null;
         this.timer=timer;
         var time=0;
@@ -21,17 +21,17 @@ define(function (require, exports, module) {
     };
    function Timer(){}
     Timer.timers={};
-    Timer.prototype.register=function(options){
+    Timer.prototype.register=function(id){
 //        crete new timer
-        Timer.timers[options.issue]= new t(options);
-        return Timer.timers[options.issue];
+        Timer.timers[id]= new t(id);
+        return Timer.timers[id];
     };
-    Timer.prototype.hasTimer=function(issue){
-        if(!!Timer.timers[issue]) return true;
+    Timer.prototype.hasTimer=function(id){
+        if(!!Timer.timers[id]) return true;
         return false;
     };
-    Timer.prototype.getTimer=function(issue){
-        return Timer.timers[issue];
+    Timer.prototype.getTimer=function(id){
+        return Timer.timers[id];
     }
     var timer= new Timer();
     module.exports=timer;

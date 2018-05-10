@@ -83,6 +83,7 @@ define(function (require, exports, module) {
 
 
     // Extension init code goes at the bottom
+    ExtensionUtils.loadStyleSheet(module, "styles/glyphicons.less");
     ExtensionUtils.loadStyleSheet(module, "styles/styles.css");
     ExtensionUtils.loadStyleSheet(module, "styles/simplePagination.css");
     // Register the command -- The command and the command title are kept together

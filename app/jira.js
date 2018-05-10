@@ -178,9 +178,11 @@ define(function (require, exports, module) {
             $(this).prop("checked",(!$(this).is(":checked")));
             Jira.sprint={id:$(this).val(),key:$(this).attr("data-key")};
             $(".jira-option").prop("disabled",false);
-            if(!!Jira.timer && Jira.timer.id!=jiraTimer.getTimer(Jira.sprint.key)){
-                $(".jira-log-time").prop("disabled",true);
-                console.log("here");
+            if(!!Jira.timer){
+                if(Jira.timer.id!=Jira.sprint.key){
+                    $(".jira-log-time").prop("disabled",true);
+                }else
+                     $(".jira-log-time").prop("disabled",false);
             }
             $(".jira-log-time").off("click").on("click",function(){
                 if(!!Jira.timer){
