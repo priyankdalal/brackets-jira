@@ -1,11 +1,14 @@
 define(function (require, exports, module) {
     function t(id){
         this.id=id;
+        var running=false;
+        this.running=running;
         var timer=null;
         this.timer=timer;
         var time=0;
         this.time=time;
         this.start=function(){
+            running=true;
             timer=setInterval(function(){
                 time++;
                 console.log(time);
@@ -13,8 +16,9 @@ define(function (require, exports, module) {
         };
         this.stop=function(){
             clearInterval(timer);
+            running=false;
         };
-        this.restart=function(){
+        this.reset=function(){
             clearInterval(timer);
             timer=0;
         };
@@ -33,6 +37,13 @@ define(function (require, exports, module) {
     Timer.prototype.getTimer=function(id){
         return Timer.timers[id];
     }
+    Timer.prototype.saveState=function(id,t){
+        Timer.timers[id]={};
+        Timer.timers[id]=t;
+    }
+    Timer.prototype.getAllTimers=function(){
+        return Timer.timers;
+    };
     var timer= new Timer();
     module.exports=timer;
 });

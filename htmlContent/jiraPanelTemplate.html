@@ -1,21 +1,22 @@
 <div id="jira-panel" class="jira bottom-panel vert-resizable top-resizer no-focus">
+   <div class="loader"></div>
     <div class="toolbar simple-toolbar-layout mainToolbar">
        <div class="btn-group"><label for="" class="control-label"><strong>Jira</strong></label></div>
         <div class="btn-group">
-           <label for="" class="control-label lable-sm">Filters:</label>
+           <label for="" class="control-label lable-sm"><span class="glyphicon glyphicon-filter blue"></span> : </label>
             <select id="jira_project" class="input-sm">{{{project_options}}}</select>
             <input type="text" id="jira_assignee" class="form-control input-sm" placeholder="enter assignee">
-            <button id="jira_get_list" class="btn btn-primary">Get List <span class="glyphicon glyphicon-cloud-download"></span></button>
+            <button id="jira_get_list" class="btn btn-primary"><span class="glyphicon glyphicon-cloud-download blue"></span></button>
         </div>
         <div class="jira-right-icons">
             <div class="btn-group dropup">
-               <button class="jira-option btn btn-primary btn-small jira-log-time" type="button" data-timer="off" disabled>Log Time</button>
+               <button class="jira-option btn btn-primary jira-log-time" type="button" data-timer="off" disabled><span class="glyphicon glyphicon-time blue"></span></button>
                 <ul class="dropdown-menu">
                     <li><a href="#" class="jira-get-comment">Get Comments</a></li>
                     <li><a href="#" class="jira-get-worklog">Get worklog</a></li>
                     <li><a href="#" class="jira-update-time">Update Time</a></li>
                 </ul>
-                <button class="jira-option btn btn-primary btn-small dropdown-toggle" type="button" data-toggle="dropdown" disabled>Options
+                <button class="jira-option btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" disabled>Options
                     <span class="caret"></span>
                 </button>
             </div>

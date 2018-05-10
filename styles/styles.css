@@ -1,6 +1,14 @@
 /*
  * Place CSS here
  */
+/*
+* colors
+*/
+#jira-panel .blue{color:#379ec7;}
+#jira-panel .red{color:#db5050;}
+
+
+
 #jira-panel{font-size: 9px;}
 #jira-panel .toolbar{overflow: visible;}
 #jira-panel label{display: inline-block;line-height: 1.6;vertical-align: middle;}
@@ -30,6 +38,14 @@
 #jira-panel #jira_table td{
     padding-left:0px !important;
     text-align: center;
+}
+#jira-panel #jira_table th{
+    padding-left:0px !important;
+    text-align: center;
+}
+#jira-panel #jira_table th:nth-child(3),
+#jira-panel #jira_table td:nth-child(3){
+    text-align: left;
 }
 #jira-panel #jira_table input[type=checkbox]{
     width:13px;
@@ -87,3 +103,10 @@
     margin-top: 6px;
 }
 #pagination_container{display: none;}
+
+.record-animation{
+    animation: record-anim 1s ease-in infinite;
+}
+@keyframes record-anim{
+    50% {transform: scale(1.2);font-weight: bold;}
+}

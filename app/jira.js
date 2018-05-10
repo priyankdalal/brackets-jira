@@ -88,6 +88,7 @@ define(function (require, exports, module) {
                 Jira.panel.hide();
             });
             $("#jira_get_list").click(function(){
+                Jira.$panel.find("#jira_table").empty().append("<tr><th>fetching data<span class='jira-loading'>.</span><span class='jira-loading'>.</span><span class='jira-loading'>.</span></th></tr>");
                 Jira.project=$("#jira_project").val();
                 Jira.assignee=$("#jira_assignee").val();
                 Jira.getTickets(0,Jira.showTickets);
@@ -178,8 +179,10 @@ define(function (require, exports, module) {
             $(this).prop("checked",(!$(this).is(":checked")));
             Jira.sprint={id:$(this).val(),key:$(this).attr("data-key")};
             $(".jira-option").prop("disabled",false);
+            console.log(jiraTimer.getAllTimers());
+            console.log(Jira.timer);
             if(!!Jira.timer){
-                if(Jira.timer.id!=Jira.sprint.key){
+                if(Jira.timer.id!=Jira.sprint.key && Jira.timer.running){
                     $(".jira-log-time").prop("disabled",true);
                 }else
                      $(".jira-log-time").prop("disabled",false);
@@ -188,21 +191,23 @@ define(function (require, exports, module) {
                 if(!!Jira.timer){
                     if($(this).attr("data-timer")=="off"){
                         Jira.timer.start();
-                        $(this).attr("data-timer","on");
-                        $(this).text("Stop Timer.");
+                        $(this).attr({"data-timer":"on","title":"recording for "+Jira.sprint.key});
+                        $(this).find("span").removeClass("glyphicon-time blue").addClass("glyphicon-record red record-animation");
                     }else{
                         Jira.timer.stop();
+                        jiraTimer.saveState(Jira.sprint.key,Object.assign({},Jira.timer));
                         $(this).attr("data-timer","off");
-                        $(this).text("Log Time.");
+                        $(this).find("span").removeClass("glyphicon-record red record-animation").addClass("glyphicon-time blue");
                     }
                 }else{
+                    Jira.timer={};
                     if(jiraTimer.hasTimer(Jira.sprint.key))
-                        Jira.timer=jiraTimer.getTimer(Jira.sprint.key);
+                        Jira.timer=Object.assign({},jiraTimer.getTimer(Jira.sprint.key));
                     else
-                        Jira.timer=jiraTimer.register(Jira.sprint.key);
+                        Jira.timer=Object.assign({},jiraTimer.register(Jira.sprint.key));
                     Jira.timer.start();
                     $(this).attr("data-timer","on");
-                    $(this).text("Stop Timer.");
+                    $(this).find("span").removeClass("glyphicon-time blue").addClass("glyphicon-record red record-animation");
                 }
 
             });
@@ -237,8 +242,8 @@ define(function (require, exports, module) {
                 callback(sprint,res);
             },
             error:function(res){
-                alert("error: "+ r.status+ ",\nreason: "+ r.statusText);
-                console.log(r);
+                alert("error: "+ res.status+ ",\nreason: "+ res.statusText);
+                console.log(res);
             }
         });
     };
