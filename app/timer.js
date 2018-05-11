@@ -1,49 +1,71 @@
 define(function (require, exports, module) {
-    function t(id){
-        this.id=id;
-        var running=false;
-        this.running=running;
-        var timer=null;
-        this.timer=timer;
-        var time=0;
-        this.time=time;
+    function Timer(){
+        var that=this;
+        that.running=false;
+        that.time=0;
         this.start=function(){
-            running=true;
-            timer=setInterval(function(){
-                time++;
-                console.log(time);
+            that.running=true;
+            that.interval=setInterval(function(){
+                that.time++;
+                console.log(that.time);
             },1000);
         };
         this.stop=function(){
-            clearInterval(timer);
-            running=false;
+            clearInterval(that.interval);
+            that.running=false;
         };
         this.reset=function(){
-            clearInterval(timer);
-            timer=0;
+            clearInterval(that.interval);
+            that.time=0;
         };
-    };
-   function Timer(){}
-    Timer.timers={};
-    Timer.prototype.register=function(id){
-//        crete new timer
-        Timer.timers[id]= new t(id);
-        return Timer.timers[id];
-    };
-    Timer.prototype.hasTimer=function(id){
-        if(!!Timer.timers[id]) return true;
-        return false;
-    };
-    Timer.prototype.getTimer=function(id){
-        return Timer.timers[id];
-    }
-    Timer.prototype.saveState=function(id,t){
-        Timer.timers[id]={};
-        Timer.timers[id]=t;
-    }
-    Timer.prototype.getAllTimers=function(){
-        return Timer.timers;
+        this.isRunning=function(){
+            return that.running;
+        }
+        this.getTime=function(){
+            return that.time;
+        }
+        this.setTime=function(t){
+            that.time=t;
+        }
     };
     var timer= new Timer();
-    module.exports=timer;
+    function TimerManager(){}
+    TimerManager.timers={};
+    TimerManager.prototype.register=function(id){
+    //        create new timer
+        TimerManager.timers[id]= {
+            id:id,
+            time:0,
+            running:false,
+            start:function(){
+                //debugger;
+                timer.time=this.time;
+                timer.start();
+                this.running=true;
+            },
+            stop:function(){
+                timer.stop();
+                this.time=timer.time;
+                this.running=false;
+            },
+            reset:function(){
+                timer.stop();
+                this.time=0;
+                this.running=false;
+            }
+         };
+        return TimerManager.timers[id];
+    };
+    TimerManager.prototype.hasTimer=function(id){
+        if(!!TimerManager.timers[id]) return true;
+        return false;
+    };
+    TimerManager.prototype.getTimer=function(id){
+        return TimerManager.timers[id];
+    }
+    TimerManager.prototype.getAllTimers=function(){
+        return TimerManager.timers;
+    };
+    var timerManager= new TimerManager();
+    module.exports=timerManager;
 });
