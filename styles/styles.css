@@ -103,7 +103,10 @@
     margin-top: 6px;
 }
 #pagination_container{display: none;}
-
+#jira-toolbar-btn {
+    background-image: url(../img/jira.png);
+    background-size: cover;
+}
 .record-animation{
     animation: record-anim 1s ease-in infinite;
 }

@@ -93,4 +93,7 @@ define(function (require, exports, module) {
     var menu = Menus.addMenu(jiraStrings.MENU_LABEL, JIRA_MENUID, Menus.BEFORE, Menus.AppMenuBar.HELP_MENU);
     // Now add the menu item to invoke it.  Add a keyboard shortcut as well.
     menu.addMenuItem(JIRA_COMMANDID, "Ctrl-Alt-X");
+    var jiraToolbarBtn='<a href="#" title="Jira" id="jira-toolbar-btn"></a>';
+    $(jiraToolbarBtn).appendTo("#main-toolbar > .buttons")
+                      .on("click", showMyDialog);
 });
