@@ -146,7 +146,7 @@ define(function (require, exports, module) {
                 +"<td class='"+ t[i].fields.issuetype.name.toLowerCase() +"'>"+ t[i].fields.issuetype.name+ "</td>"
                 +"<td>"+ t[i].fields.priority.name+ "</td>"
                 +"<td>"+ t[i].fields.reporter.name+ "</td>"
-                +"<td>"+ t[i].fields.status.name+ "</td>";
+                +"<td class='sprint-status'>"+ t[i].fields.status.name+ "</td>";
             h+="</tr>";
         }
         if(t.length<1){
@@ -207,7 +207,9 @@ define(function (require, exports, module) {
                 }
             });
         });
+        Jira.$panel.find("sprint-status").off("click").on("click",function(){
 
+        });
         Jira.$panel.find(".jira-get-comment").off("click").on("click",function(){
             Jira.getComments(Jira.sprint,Jira.showCommentsDialog);
         });
@@ -265,7 +267,7 @@ define(function (require, exports, module) {
         };
         var dialog = Dialogs.showModalDialogUsingTemplate(Mustache.render(CommentDialogTemplate, m_opt));
         console.log(dialog._$dlg);
-        dialog._$dlg.find(".dialog-add-comment").on("click",function(){
+        dialog._$dlg.find(".dialog-add-comment").off("click").on("click",function(){
             var comment=dialog._$dlg.find(".jira-comment-input").val();
             var data={"body":comment};
             Jira.addComment(sprint,data);
@@ -368,6 +370,29 @@ define(function (require, exports, module) {
     };
     Jira.getHttpsResponse=function(data){
         console.log(data);
+    };
+    Jira.updataStatus=function(sprint,data){
+        var options={
+            "body":data,
+            "host":config.host,
+            "path":path,
+            "headers": {
+                "Authorization":"Basic "+btoa(config.username+ ":"+ config.token),
+                "Accept":"application/json",
+                "Content-Type": "application/json; charset=utf-8",
+            },
+        };
+        httpsDomain.exec("getHttps",options);
+        httpsDomain.on("httpsresponse",function(ev,scope,message,data){
+            console.log(ev);
+            console.log(scope);
+            console.log(message);
+            console.log(data);
+            if(data.hasOwnProperty("id"))
+                alert("Comment submitted.");
+            else
+                alert("Failed to comment.");
+        });
     };
     var jira=new Jira();
     module.exports = jira;

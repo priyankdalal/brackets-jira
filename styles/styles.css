@@ -54,10 +54,13 @@
     cursor: pointer;
 }
 #jira-panel .bug{
-    background-color:#f1acac !important;
+    background-color:#924646 !important;
 }
 #jira-panel .task{
-    background-color:#a6f2a6 !important;
+    background-color:#3a903a !important;
+}
+#jira-panel .enhancement{
+    background-color:#29296f !important;
 }
 #jira-panel .jira-right-icons{
     position: absolute;
