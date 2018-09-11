@@ -27,6 +27,11 @@ maxerr: 50, node: true */
         post_options.headers['Content-Length']=Buffer.byteLength(post_data);
         var post_req = https.request(post_options, function(res) {
             res.setEncoding('utf8');
+            console.log(res.statusCode);
+            if(res.statusCode==204){
+                let bee={"status":200,"msg":"ok"};
+                _domainManager.emitEvent("httpsDomain","httpsresponseok",['scope',res.statusCode,JSON.parse(bee)]);
+            }
             res.on('data', function (chunk) {
                 //_domainManager.emitEvent("httpsDomain","httpsresponse",['scope','message',JSON.parse(chunk)]);
                 _domainManager.emitEvent("httpsDomain","httpsresponse",['scope',res.statusCode,JSON.parse(chunk)]);
@@ -65,6 +70,23 @@ maxerr: 50, node: true */
         domainManager.registerEvent(
             "httpsDomain",     // domain name
             "httpsresponse",         // event name
+            [{
+                name: "scope",
+                type: "string",
+                description: "message scope"
+            }, {
+                name: "message",
+                type: "string",
+                description: "message body"
+            }, {
+                name: "payload",
+                type: "object",
+                description: "log message payload"
+            }]
+        );
+        domainManager.registerEvent(
+            "httpsDomain",     // domain name
+            "httpsresponseok",         // event name
             [{
                 name: "scope",
                 type: "string",

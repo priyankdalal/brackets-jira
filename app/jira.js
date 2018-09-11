@@ -400,7 +400,6 @@ define(function (require, exports, module) {
                 },
                 CLOSE:"Close"
             };
-            console.log(Mustache.render(transitionDialog, m_opt));
             var dialog = Dialogs.showModalDialogUsingTemplate(Mustache.render(transitionDialog, m_opt));
             dialog._$dlg.find(".dialog-do-transition").off("click").on("click",function(){
                 var state=dialog._$dlg.find(".to-transtion").val();
@@ -421,15 +420,12 @@ define(function (require, exports, module) {
                 },
             };
             httpsDomain.exec("getHttps",options);
-            httpsDomain.on("httpsresponse",function(ev,scope,message,data){
+            httpsDomain.on("httpsresponseok",function(ev,scope,message,data){
                 console.log(ev);
                 console.log(scope);
                 console.log(message);
                 console.log(data);
-                if(data.hasOwnProperty("id"))
-                    alert("Comment submitted.");
-                else
-                    alert("Failed to comment.");
+                alert("Transition completed.");
             });
         }
     };

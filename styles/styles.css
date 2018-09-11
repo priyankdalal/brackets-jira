@@ -129,7 +129,6 @@
     bottom: 0;
     left:0;
     right:0;
-    display: none;
 }
 .jira-loader-ripple {
   display: inline-block;
