@@ -29,7 +29,7 @@ maxerr: 50, node: true */
             res.setEncoding('utf8');
             console.log(res.statusCode);
             if(res.statusCode==204){
-                let bee={"status":200,"msg":"ok"};
+                let bee=JSON.stringify({"status":200,"msg":"ok"});
                 _domainManager.emitEvent("httpsDomain","httpsresponseok",['scope',res.statusCode,JSON.parse(bee)]);
             }
             res.on('data', function (chunk) {
