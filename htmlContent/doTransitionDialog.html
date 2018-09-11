@@ -1,0 +1,25 @@
+<div class="jira-comment-dialog modal">
+    <div class="modal-header">
+        <h1 class="dialog-title">{{DIALOG_TITLE}}</h1>
+    </div>
+    <div class="modal-body">
+       <div class="jira-center-box">
+            <div class="form-group">
+                <label for="from">From:</label>
+                <input type="text" class="form-control" id="from" value="{{FROM}}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="to">To:</label>
+                <select name="to_transition" id="" class="form-control to-transtion">
+                    {{#transitions}}
+                        <option value="{{id}}">{{name}}</option>
+                    {{/transitions}}
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+       <button class="dialog-button btn primary dialog-do-transition" data-button-id="close"><span class="glyphicon glyphicon-cloud-upload"></span></button>
+        <button class="dialog-button btn basic" data-button-id="close">{{CLOSE}}</button>
+    </div>
+</div>

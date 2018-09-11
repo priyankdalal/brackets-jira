@@ -28,7 +28,8 @@ maxerr: 50, node: true */
         var post_req = https.request(post_options, function(res) {
             res.setEncoding('utf8');
             res.on('data', function (chunk) {
-                _domainManager.emitEvent("httpsDomain","httpsresponse",['scope','message',JSON.parse(chunk)]);
+                //_domainManager.emitEvent("httpsDomain","httpsresponse",['scope','message',JSON.parse(chunk)]);
+                _domainManager.emitEvent("httpsDomain","httpsresponse",['scope',res.statusCode,JSON.parse(chunk)]);
             }).on('error',function(e){
                 _domainManager.emitEvent("httpsDomain","httpserror",[e]);
             });

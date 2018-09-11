@@ -36,6 +36,7 @@ define(function (require, exports, module) {
     var jiraPanelTemplate=require("text!htmlContent/jiraPanelTemplate.html");
     var CommentDialogTemplate=require("text!htmlContent/commentDialog.html");
     var CommentDialogMediaTemplate=require("text!htmlContent/commentDialogMediaTemplate.html");
+    var transitionDialog=require("text!htmlContent/doTransitionDialog.html");
     var httpsDomain=new NodeDomain("httpsDomain",ExtensionUtils.getModulePath(module, "../node/httpsDomain"));
     var configData=require("text!config/config.json");
     var config=JSON.parse(configData);
@@ -137,7 +138,7 @@ define(function (require, exports, module) {
         var h="<tr><th>Tick</th><th>Key</th><th>Summary</th><th>Assignee</th><th>Created By</th><th>Date</th><th>Type</th><th>Priority</th><th>Reporter</th><th>Status</th></tr>";
         for(var i=0;i<t.length;i++){
             h+="<tr class='ticket' data-id='"+ t[i].id +"' data-seq='"+ i+ "'>";
-            h+="<td><input type='checkbox' class='sprint-check' data-key='"+ t[i].key+ "' value='"+ t[i].id+ "' /></td>"
+            h+="<td><input type='checkbox' class='sprint-check' data-key='"+ t[i].key+ "' value='"+ t[i].id+ "' data-status='"+ t[i].fields.status.name+ "' /></td>"
                 +"<td>"+ t[i].key+ "</td>"
                 +"<td class='ticket-summary'>"+ t[i].fields.summary+ "</td>"
                 +"<td>"+ t[i].fields.assignee.name+ "</td>"
@@ -177,7 +178,7 @@ define(function (require, exports, module) {
         jiraTable.find(".sprint-check").on("click",function(){
             $(".sprint-check").prop("checked",false);
             $(this).prop("checked",(!$(this).is(":checked")));
-            Jira.sprint={id:$(this).val(),key:$(this).attr("data-key")};
+            Jira.sprint={id:$(this).val(),key:$(this).attr("data-key"),status:$(this).attr("data-status")};
             $(".jira-option").prop("disabled",false);
             if(!Jira.isObjectEmpty(Jira.timer)){
                 if(Jira.timer.id!=Jira.sprint.key && Jira.timer.running){
@@ -216,6 +217,9 @@ define(function (require, exports, module) {
         Jira.$panel.find(".jira-get-worklog").off("click").on("click",function(){
             Jira.getWorklog(Jira.sprint,Jira.showWorklog);
         });
+        Jira.$panel.find(".jira-do-transition").off("click").on("click",function(){
+            Jira.transition.getTransitionsForIssue(Jira.sprint,Jira.transition.showTransitionModal);
+        });
         /*Jira.$panel.find(".jira-update-time").off("click").on("click",function(){
 
         });*/
@@ -237,7 +241,6 @@ define(function (require, exports, module) {
                 "Authorization":"Basic "+btoa(config.username+ ":"+ config.token),
                 "Accept":"application/json"
             },
-            timeout:5000,
             success:function(res){
                 console.log(res);
                 callback(sprint,res);
@@ -320,31 +323,7 @@ define(function (require, exports, module) {
         }
     }
     Jira.addComment=function(sprint,data){
-        /*var url=config.url+ config.api.addComment.replace("key",sprint.id);
-        console.log(url);
-        $.ajax({
-            url:url,
-            type:"POST",
-            timeout:5000,
-            headers:{
-                "Authorization":"Basic "+btoa(config.username+ ":"+ config.token),
-                "Accept":"application/json",
-                "Content-Type": "application/json; charset=utf-8",
-                'Access-Control-Allow-Origin': '*,',
-                "user-agent":"Mozilla/5.0 (Windows NT 6.3; Win64; x64; AppleWebKit-537.36; Chrome-45.0.2454.85; Electron-0.34.2; Safari-537.36) like Gecko"
-            },
-            dataType:"json",
-            data:data,
-            timeout:5000,
-            success:function(res){
-                console.log(res);
-                //callback(sprint,res);
-            },
-            error:function(res){
-                console.log(res);
-            }
-        });*/
-        var url="reqres.in/api/users";
+        //var url="reqres.in/api/users";
         var path=config.api.addComment.replace("key",sprint.id);
         var options={
             "body":data,
@@ -394,6 +373,67 @@ define(function (require, exports, module) {
                 alert("Failed to comment.");
         });
     };
+    Jira.transition={
+        getTransitionsForIssue:function(sprint,callback){
+            var url=config.url+ config.api.transition.getAvailableTransitions.replace("key",sprint.id);
+            $.ajax({
+                url:url,
+                timeout:5000,
+                headers:{
+                    "Authorization":"Basic "+btoa(config.username+ ":"+ config.token),
+                    "Accept":"application/json"
+                },
+                success:function(res){
+                    console.log(res);
+                    callback(sprint,res);
+                },
+            });
+        },
+        showTransitionModal:function(sprint,data){
+            console.log(sprint);
+            var m_opt={
+                DIALOG_TITLE:"Do transition for "+sprint.key,
+                transitions:data.transitions,
+                FROM:sprint.status,
+                option:function(){
+                    return "<option value='"+ this.id+ "'>"+ this.name+ "</option>";
+                },
+                CLOSE:"Close"
+            };
+            console.log(Mustache.render(transitionDialog, m_opt));
+            var dialog = Dialogs.showModalDialogUsingTemplate(Mustache.render(transitionDialog, m_opt));
+            dialog._$dlg.find(".dialog-do-transition").off("click").on("click",function(){
+                var state=dialog._$dlg.find(".to-transtion").val();
+                var data={"transition": {"id": state}};
+                Jira.transition.do(sprint,data);
+            });
+        },
+        do:function(sprint,data){
+            var path=config.api.transition.doTransition.replace("key",sprint.key);
+            var options={
+                "body":data,
+                "host":config.host,
+                "path":path,
+                "headers": {
+                    "Authorization":"Basic "+btoa(config.username+ ":"+ config.token),
+                    "Accept":"application/json",
+                    "Content-Type": "application/json; charset=utf-8",
+                },
+            };
+            httpsDomain.exec("getHttps",options);
+            httpsDomain.on("httpsresponse",function(ev,scope,message,data){
+                console.log(ev);
+                console.log(scope);
+                console.log(message);
+                console.log(data);
+                if(data.hasOwnProperty("id"))
+                    alert("Comment submitted.");
+                else
+                    alert("Failed to comment.");
+            });
+        }
+    };
+
     var jira=new Jira();
     module.exports = jira;
 });

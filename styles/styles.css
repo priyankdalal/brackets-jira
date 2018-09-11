@@ -116,6 +116,10 @@
 @keyframes record-anim{
     50% {transform: scale(1.2);font-weight: bold;}
 }
+.jira-center-box{
+    width:40%;
+    margin:auto;
+}
 /************************************************************
 ******loader
 ************************************************************/
@@ -125,6 +129,7 @@
     bottom: 0;
     left:0;
     right:0;
+    display: none;
 }
 .jira-loader-ripple {
   display: inline-block;
