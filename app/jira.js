@@ -46,6 +46,7 @@ define(function (require, exports, module) {
     }
     Jira.project="";
     Jira.assignee="";
+    Jira.reporter="";
     Jira.panel=null;
     Jira.$panel=null;
     Jira.panelElement=null;
@@ -92,6 +93,7 @@ define(function (require, exports, module) {
                 Jira.$panel.find("#jira_table").empty().append("<tr><th>fetching data<span class='jira-loading'>.</span><span class='jira-loading'>.</span><span class='jira-loading'>.</span></th></tr>");
                 Jira.project=$("#jira_project").val();
                 Jira.assignee=$("#jira_assignee").val();
+                Jira.reporter=$("#jira_reporter").val();
                 Jira.getTickets(0,Jira.showTickets);
             });
         }
@@ -101,7 +103,8 @@ define(function (require, exports, module) {
         Jira.$panel.find("#jira_table").empty().append("<tr><th>fetching data<span class='jira-loading'>.</span><span class='jira-loading'>.</span><span class='jira-loading'>.</span></th></tr>");
         $(".jira-option").prop("disabled",true);
         var jql="project = "+Jira.project;
-        if(!!Jira.assignee) jql+=" and assignee = "+ Jira.assignee;
+        if(!!Jira.assignee) jql+=" and assignee = '"+ Jira.assignee+ "'";
+        if(!!Jira.reporter) jql+=" and reporter ='"+ Jira.reporter+ "'";
         $.ajax({
             url:config.url+ config.api.tickets,
             timeout:5000,

@@ -1,8 +1,8 @@
 {
-    "username": "priyank@aquacrmsoftware.com",
-    "token": "ni0IeiNKxT57UzDqPtd25ACD",
-    "host": "aquacrmsoftware.atlassian.net",
-    "url": "https://aquacrmsoftware.atlassian.net",
+    "username": "priyankk@247around.com",
+    "token": "clR6AvFivTrkj6vczykE82D3",
+    "host": "blackmelon.atlassian.net",
+    "url": "https://blackmelon.atlassian.net",
     "api": {
         "all_projects": "/rest/api/2/project",
         "tickets": "/rest/api/2/search",
